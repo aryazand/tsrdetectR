@@ -15,7 +15,7 @@ find_tss <- function(input_bed, half_window_size, technique, pseudo_count = 1, t
     checkmate::checkNumeric(threshold)
   }
 
-  if (any(strand(input_bed) == "*")) {
+  if (any(BiocGenerics::strand(input_bed) == "*")) {
     stop("all intervals in input_bed must be strand-specific")
   }
 
@@ -25,14 +25,13 @@ find_tss <- function(input_bed, half_window_size, technique, pseudo_count = 1, t
 
   # Get 5' ends
   fiveprime_ends <- input_bed |> GenomicRanges::resize(width = 1, fix = "start")
-  fiveprime_ends.split <- split(fiveprime_ends, strand(fiveprime_ends)) |>
-    as.list() |>
-    within(expr = rm(`*`)) #remove automatically produced non-strand specific element
+  fiveprime_ends.split <- split(fiveprime_ends, BiocGenerics::strand(fiveprime_ends)) |>
+    as.list()
 
   ####
 
   # Calculate local background ------------------
-  cvg <- coverage(fiveprime_ends)
+  cvg <- GenomicRanges::coverage(fiveprime_ends)
   w = 1 + half_window_size*2
   local_bg <- get_local_background(cvg, k = w, technique = technique, pseudo_count = 0.01, endrule = "constant")
 
@@ -40,7 +39,7 @@ find_tss <- function(input_bed, half_window_size, technique, pseudo_count = 1, t
 
   # Calculate Score-to-background-ratio ------------------
   score_to_bg_ratio <-
-    purrr::map(fiveprime_ends.split, coverage) |>
+    purrr::map(fiveprime_ends.split, GenomicRanges::coverage) |>
     purrr::map(~ (.x + pseudo_count)/(local_bg + pseudo_count))
 
   ####
@@ -48,12 +47,12 @@ find_tss <- function(input_bed, half_window_size, technique, pseudo_count = 1, t
   # Convert into GRanges object ----------------
 
   score_to_bg_ratio.grange <-
-    purrr::map2(.x = score_to_bg_ratio, .y = names(x = score_to_bg_ratio), ~GRanges(.x, strand = .y)) |>
+    purrr::map2(.x = score_to_bg_ratio, .y = names(x = score_to_bg_ratio), ~GenomicRanges::GRanges(.x, strand = .y)) |>
     as("GRangesList") |>
     unlist()
 
   # Rename column
-  names(mcols(score_to_bg_ratio.grange))[names(mcols(score_to_bg_ratio.grange)) == "score"] <- "score_to_bg"
+  names(S4Vectors::mcols(score_to_bg_ratio.grange))[names(S4Vectors::mcols(score_to_bg_ratio.grange)) == "score"] <- "score_to_bg"
   score_to_bg_ratio.grange <- unname(score_to_bg_ratio.grange)
 
   ####
