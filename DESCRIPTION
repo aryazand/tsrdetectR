@@ -12,10 +12,13 @@ RoxygenNote: 7.2.3
 BugReports: https://github.com/aryazand/tsrdetectR/issues
 Imports: 
     assertthat,
+    BiocGenerics,
+    checkmate,
     dplyr,
     GenomicRanges,
     purrr,
     rtracklayer,
+    S4Vectors,
     tibble,
     tidyr,
     zoo
