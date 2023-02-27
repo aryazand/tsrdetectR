@@ -37,7 +37,7 @@ find_tss <- function(input_bed, half_window_size, technique, pseudo_count = 0.01
   local_bg_grange <- GenomicRanges::GRanges(local_bg)
 
   # Add to local background to GRanges
-  overlaps <- findOverlaps(fiveprime_ends, local_bg_grange)
+  overlaps <- GenomicRanges::findOverlaps(fiveprime_ends, local_bg_grange)
   fiveprime_ends$bg_score <- BiocGenerics::score(local_bg_grange)[overlaps@to]
 
   # Calculate score-to-local-background ratio
