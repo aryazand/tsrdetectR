@@ -24,7 +24,7 @@ find_tss <- function(input_bed, half_window_size, technique, pseudo_count = 1, t
   # Prepare input_bed -----------
 
   # Get 5' ends
-  fiveprime_ends <- get_fiveprimeends_grange(input_bed)
+  fiveprime_ends <- make_fiveprimeends_grange(input_bed)
 
   ####
 
@@ -76,7 +76,7 @@ get_local_background <- function(x, k, technique, pseudo_count = 0.1, ...) {
   }
 }
 
-get_fiveprimeends_grange <- function(input_bed) {
+make_fiveprimeends_grange <- function(input_bed) {
 
   checkmate::assert(
     checkmate::checkClass(input_bed, "GRanges")
