@@ -1,5 +1,5 @@
 
-find_tss <- function(input_bed, half_window_size, technique, pseudo_count = 0.01, threshold = NULL) {
+find_tss <- function(input_bed, half_window_size, technique, pseudo_count = 1, threshold = NULL) {
 
   # Check input parameters -----------
   checkmate::assert(
