@@ -46,12 +46,12 @@ find_tss <- function(input_bed, half_window_size, technique, pseudo_count = 1, t
   ####
 
   # Apply threshold --------------
-  if (!is.null(threshold)) {
-    fiveprime_ends[BiocGenerics::score(fiveprime_ends) > threshold]
-  } else {
-    message("Please provide a threshold value. Automatic thresholding is a work-in-progress. Returning unthresholded GRange object")
-    fiveprime_ends
+  if (is.null(threshold)) {
+    threshold <- get_threshold_value(fiveprime_ends$score_to_bg_ratio)
   }
+
+  message(paste("Thresholding on a value of", threshold))
+  fiveprime_ends[fiveprime_ends$score_to_bg_ratio > threshold]
 }
 
 get_local_background <- function(x, k, technique, pseudo_count = 0.1, ...) {
