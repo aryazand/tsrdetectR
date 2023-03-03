@@ -1,10 +1,11 @@
 
-find_tss <- function(input_bed, half_window_size, technique, pseudo_count = 1, threshold = NULL) {
+find_tss <- function(five_prime_grange, half_window_size, technique, pseudo_count = 1, threshold = NULL) {
 
   # Check input parameters -----------
   checkmate::assert(
-    checkmate::checkClass(input_bed, "GRanges"),
-    checkmate::checkNumeric(GenomicRanges::score(input_bed), lower = 0.01, any.missing = F),
+    checkmate::checkClass(five_prime_grange, "GRanges"),
+    checkmate::checkNumeric(GenomicRanges::width(five_prime_grange), lower = 1, upper = 1),
+    checkmate::checkNumeric(BiocGenerics::score(five_prime_grange), lower = 0.01, any.missing = F),
     checkmate::checkCount(half_window_size, positive = T),
     checkmate::checkSubset(technique, c("mean_inclusive", "mean_exclusive", "geometric_mean")),
     checkmate::checkCount(pseudo_count, positive = T),
@@ -15,43 +16,38 @@ find_tss <- function(input_bed, half_window_size, technique, pseudo_count = 1, t
     checkmate::checkNumeric(threshold)
   }
 
-  if (any(BiocGenerics::strand(input_bed) == "*")) {
-    stop("all intervals in input_bed must be strand-specific")
+  if (any(BiocGenerics::strand(five_prime_grange) == "*")) {
+    stop("all intervals in five_prime_grange must be strand-specific")
   }
-
-  ####
-
-  # Prepare input_bed -----------
-
-  # Get 5' ends
-  fiveprime_ends <- make_fiveprimeends_grange(input_bed)
 
   ####
 
   # Add score-to-local-background ratio to GRanges ------------------
 
   # Calculate local background
-  cvg <- GenomicRanges::coverage(fiveprime_ends)
+  cvg <- GenomicRanges::coverage(five_prime_grange)
   w = 1 + half_window_size*2
   local_bg <- get_local_background(cvg, k = w, technique = technique, pseudo_count = 0.01, endrule = "constant")
   local_bg_grange <- GenomicRanges::GRanges(local_bg)
 
   # Add to local background to GRanges
-  overlaps <- GenomicRanges::findOverlaps(fiveprime_ends, local_bg_grange)
-  fiveprime_ends$bg_score <- BiocGenerics::score(local_bg_grange)[overlaps@to]
+  overlaps <- GenomicRanges::findOverlaps(five_prime_grange, local_bg_grange)
+  five_prime_grange$bg_score <- BiocGenerics::score(local_bg_grange)[overlaps@to]
 
   # Calculate score-to-local-background ratio
-  fiveprime_ends$score_to_bg_ratio <- (fiveprime_ends$score + pseudo_count)/(fiveprime_ends$bg_score + pseudo_count)
+  five_prime_grange$score_to_bg_ratio <- (five_prime_grange$score + pseudo_count)/(five_prime_grange$bg_score + pseudo_count)
 
   ####
 
   # Apply threshold --------------
   if (is.null(threshold)) {
-    threshold <- get_threshold_value(fiveprime_ends$score_to_bg_ratio)
+    threshold <- get_threshold_value(five_prime_grange$score_to_bg_ratio)
   }
 
   message(paste("Thresholding on a value of", threshold))
-  fiveprime_ends[fiveprime_ends$score_to_bg_ratio > threshold]
+  five_prime_grange$TSS <- five_prime_grange$score_to_bg_ratio > threshold
+
+  return(five_prime_grange)
 }
 
 get_local_background <- function(x, k, technique, pseudo_count = 0.1, ...) {
