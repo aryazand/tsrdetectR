@@ -86,12 +86,17 @@ make_fiveprimeends_grange <- function(input_bed) {
   return(fiveprime_unique)
 }
 
-get_threshold_value <- function(y) {
-  y <- sort(y)
+normalize <- function(x) {
+  (x - min(x, na.rm = T))/(max(x, na.rm = T) - min(x, na.rm = T))
+}
+
+get_threshold_value <- function(y0) {
+  y <- sort(y0)
   y_smooth <- zoo::rollmean(y, k = length(y)*0.1, fill = NA) |> log2()
-  x = seq(0, 1, length.out = length(y_smooth))
-  spline_function <- splinefun(x,y_smooth)
-  threshold = which(spline_function(x, deriv = 1) > 1 & spline_function(x) > median(y_smooth, na.rm = T)) |> min()
+  y_smooth_normalized <- normalize(y_smooth)
+  x = seq(0, 1, length.out = length(y_smooth_normalized))
+  spline_function <- splinefun(x,y_smooth_normalized)
+  threshold = which(spline_function(x, deriv = 1) > 1 & spline_function(x) > median(y_smooth_normalized, na.rm = T)) |> min()
   threshold = 2^y_smooth[threshold]
   return(threshold)
 }
