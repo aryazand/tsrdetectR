@@ -1,5 +1,5 @@
 Package: TSRdetectR
-Title: Process PRO-seq results to identify transcription start regions (TSRs) 
+Title: Analyze nascent RNA 5' ends to identify transcription start regions (TSRs) 
 Version: 0.0.0.9000
 Authors@R: 
     person("Arya", "Zandvakili", , "arya-zandvakili@uiowa.edu", role = c("aut", "cre"),
