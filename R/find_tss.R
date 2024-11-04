@@ -1,4 +1,18 @@
 
+#' Identify Transcription Start Regions
+#'
+#' @param five_prime_grange A GRanges object with all elements of width 1 represent the 5' location of PRO-seq reads
+#' @param half_window_size The window around each potential TSS to assess the local background signal
+#' @param technique A string identifying the technique to assess local background signal
+#' @param pseudo_count A pseudo-count when evaluating the ratio between signal at a potential TSS and local-background signal
+#' @param threshold Threshold value of signal-to-local background ratio to call a TSS
+#'
+#' @return The five_prime_grange with two column added or replaced: score_to_bg_ratio (a numeric) and TSS (a logical)
+#' @export
+#'
+#' @examples
+#' x = make_fiveprimeends_grange(sample_NT2_data)
+#' find_tss(x, half_window_size = 100, technique = "mean_exclusive")
 find_tss <- function(five_prime_grange, half_window_size, technique, pseudo_count = 1, threshold = NULL) {
 
   # Check input parameters -----------
@@ -72,6 +86,16 @@ get_local_background <- function(x, k, technique, pseudo_count = 0.1, ...) {
   }
 }
 
+
+#' Identify 5' end of all ranges in a GRanges object
+#'
+#' @param input_bed GRanges object
+#'
+#' @return GRanges object with all ranges of width 1
+#' @export
+#'
+#' @examples
+#' make_fiveprimeends_grange(sample_NT2_data)
 make_fiveprimeends_grange <- function(input_bed) {
 
   checkmate::assert(
