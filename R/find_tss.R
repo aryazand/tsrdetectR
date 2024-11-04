@@ -13,7 +13,11 @@
 #' @examples
 #' x = make_fiveprimeends_grange(sample_NT2_data)
 #' find_tss(x, half_window_size = 100, technique = "mean_exclusive")
-find_tss <- function(five_prime_grange, half_window_size, technique, pseudo_count = 1, threshold = NULL) {
+find_tsr <- function(five_prime_grange,
+                     half_window_size,
+                     technique,
+                     pseudo_count = 1,
+                     threshold = NULL) {
 
   # Check input parameters -----------
   checkmate::assert(
