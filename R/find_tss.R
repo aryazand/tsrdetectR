@@ -119,8 +119,8 @@ get_threshold_value <- function(y0) {
   y_smooth <- zoo::rollmean(y, k = length(y)*0.1, fill = NA) |> log2()
   y_smooth_normalized <- normalize(y_smooth)
   x = seq(0, 1, length.out = length(y_smooth_normalized))
-  spline_function <- splinefun(x,y_smooth_normalized)
-  threshold = which(spline_function(x, deriv = 1) > 1 & spline_function(x) > median(y_smooth_normalized, na.rm = T)) |> min()
+  spline_function <- stats::splinefun(x,y_smooth_normalized)
+  threshold = which(spline_function(x, deriv = 1) > 1 & spline_function(x) > stats::median(y_smooth_normalized, na.rm = T)) |> min()
   threshold = 2^y_smooth[threshold]
   return(threshold)
 }
