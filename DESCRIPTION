@@ -13,7 +13,9 @@ BugReports: https://github.com/aryazand/tsrdetectR/issues
 Imports: 
     BiocGenerics,
     checkmate,
+    GenomeInfoDb,
     GenomicRanges,
+    IRanges,
     S4Vectors,
     stats,
     zoo
