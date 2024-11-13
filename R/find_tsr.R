@@ -114,6 +114,7 @@ find_tsr <- function(five_prime_grange,
     tss.grange$background_sd <- c(sd.pos, sd.neg)
     tss.grange$zscore <- (tss.grange$score - tss.grange$background_scores)/tss.grange$background_sd
     threshold <- threshold_value_by_slope(tss.grange$zscore, threshold.value)
+    message(paste("Thresholding on a value of", threshold))
     tss.grange$sig.score <- tss.grange$zscore > threshold
   }
 
